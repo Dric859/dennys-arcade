@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+    Denny's Arcade — Landing Page
+    © 2026 Dennis Richards / Denny's Arcade (dennys-arcade.com)
+    All rights reserved. Unauthorized copying or distribution prohibited.
+-->
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Denny's Arcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --neon-pink:#FF2D78;
+  --neon-cyan:#00F5FF;
+  --neon-purple:#BF00FF;
+  --neon-amber:#FFB800;
+  --neon-green:#00FF88;
+  --dark-bg:#0A0A0F;
+  --darker:#06060A;
+}
+html,body{min-height:100%;background:var(--dark-bg);color:#fff;font-family:'Exo 2',sans-serif;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);pointer-events:none;z-index:100;}
+.grid-floor{position:fixed;bottom:0;left:0;right:0;height:45vh;background:linear-gradient(rgba(0,245,255,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,0.07) 1px,transparent 1px);background-size:60px 60px;transform:perspective(400px) rotateX(65deg);transform-origin:bottom center;pointer-events:none;z-index:0;}
+.glow-blob{position:fixed;border-radius:50%;filter:blur(120px);opacity:0.12;pointer-events:none;z-index:0;}
+.glow-blob.pink{width:600px;height:400px;background:var(--neon-pink);top:-100px;right:-100px;}
+.glow-blob.cyan{width:500px;height:350px;background:var(--neon-cyan);bottom:100px;left:-150px;}
+.glow-blob.purple{width:400px;height:300px;background:var(--neon-purple);top:40%;left:40%;}
+.page{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid rgba(0,245,255,0.1);background:rgba(6,6,10,0.8);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.nav-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:18px;letter-spacing:3px;color:#fff;text-decoration:none;text-transform:uppercase;}
+.nav-logo span{color:var(--neon-cyan);}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);text-decoration:none;font-family:'Share Tech Mono',monospace;transition:color 0.2s;}
+.nav-links a:hover{color:var(--neon-cyan);}
+.nav-insert{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--neon-amber);border:1px solid var(--neon-amber);padding:8px 16px;text-transform:uppercase;text-decoration:none;animation:blink 1.8s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* HERO */
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px 60px;text-align:center;position:relative;}
+.hero-eyebrow{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--neon-cyan);text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fadeUp 0.6s 0.3s forwards;}
+.hero-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(52px,9vw,110px);line-height:0.9;letter-spacing:-1px;text-transform:uppercase;margin-bottom:8px;opacity:0;animation:fadeUp 0.7s 0.5s forwards;}
+.hero-title .line1{display:block;color:#fff;text-shadow:0 0 40px rgba(255,255,255,0.15);}
+.hero-title .line2{display:block;background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 20px rgba(255,45,120,0.4));}
+.hero-sub{font-size:15px;font-weight:300;font-style:italic;color:rgba(255,255,255,0.7);letter-spacing:1px;margin-bottom:48px;opacity:0;animation:fadeUp 0.7s 0.7s forwards;}
+.hero-cta-group{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp 0.7s 0.9s forwards;}
+.btn-primary-arcade{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;padding:16px 36px;background:var(--neon-pink);color:#fff;border:none;cursor:pointer;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);transition:transform 0.15s,filter 0.15s;}
+.btn-primary-arcade:hover{transform:scale(1.04);filter:brightness(1.2);}
+.btn-secondary-arcade{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;color:var(--neon-cyan);border:1px solid rgba(0,245,255,0.4);padding:15px 28px;background:rgba(0,245,255,0.04);transition:background 0.2s,border-color 0.2s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);}
+.btn-secondary-arcade:hover{background:rgba(0,245,255,0.1);border-color:var(--neon-cyan);}
+
+/* TICKER */
+.ticker{background:rgba(0,0,0,0.6);border-top:1px solid rgba(255,45,120,0.3);border-bottom:1px solid rgba(255,45,120,0.3);padding:10px 0;overflow:hidden;white-space:nowrap;margin:40px 0 0;opacity:0;animation:fadeIn 0.5s 1.2s forwards;}
+.ticker-inner{display:inline-block;animation:ticker 28s linear infinite;}
+.ticker-inner span{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--neon-pink);padding:0 40px;}
+.ticker-inner span.sep{color:var(--neon-cyan);padding:0 10px;}
+@keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* CONSTRUCTION BAR */
+.construction-bar{background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.2);padding:12px 40px;display:flex;align-items:center;justify-content:center;gap:12px;opacity:0;animation:fadeIn 0.5s 1.4s forwards;}
+.construction-bar p{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--neon-amber);text-transform:uppercase;}
+.construction-bar p em{color:rgba(255,184,0,0.6);font-style:normal;}
+
+/* LEADERBOARD STRIP */
+.leaderboard-strip{background:rgba(191,0,255,0.04);border:1px solid rgba(191,0,255,0.15);padding:20px 40px;display:flex;align-items:center;gap:32px;overflow-x:auto;}
+.lb-label{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:var(--neon-purple);text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.lb-entries{display:flex;gap:24px;align-items:center;}
+.lb-entry{display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.lb-rank{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--neon-amber);width:20px;}
+.lb-name{font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;}
+.lb-score{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--neon-cyan);}
+.lb-sep{width:1px;height:20px;background:rgba(255,255,255,0.1);}
+
+/* GAMES SECTION */
+.games-section{padding:80px 40px;max-width:1100px;margin:0 auto;width:100%;}
+.section-header{display:flex;align-items:baseline;gap:16px;margin-bottom:48px;}
+.section-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--neon-cyan);text-transform:uppercase;}
+.section-title{font-family:'Orbitron',monospace;font-weight:700;font-size:28px;text-transform:uppercase;letter-spacing:2px;color:#fff;}
+.section-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(0,245,255,0.3),transparent);}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+.game-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;cursor:pointer;transition:transform 0.2s,border-color 0.2s;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));}
+.game-card:hover{transform:translateY(-4px);}
+.game-card.active{border-color:rgba(0,245,255,0.3);}
+.game-card.active:hover{border-color:rgba(0,245,255,0.6);}
+.game-card.coming-soon{border-color:rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);}
+.game-card-screen{height:180px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--darker);}
+.game-screen-art{width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;}
+.shooter-art{background:radial-gradient(ellipse at center,rgba(0,245,255,0.08) 0%,transparent 70%);}
+.shooter-art::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,0.9) 1px,transparent 1px),radial-gradient(circle at 70% 20%,rgba(255,255,255,0.7) 1px,transparent 1px),radial-gradient(circle at 50% 60%,rgba(255,255,255,0.8) 1px,transparent 1px),radial-gradient(circle at 85% 70%,rgba(255,255,255,0.6) 1px,transparent 1px),radial-gradient(circle at 10% 80%,rgba(255,255,255,0.7) 1px,transparent 1px),radial-gradient(circle at 60% 85%,rgba(255,255,255,0.5) 1px,transparent 1px),radial-gradient(circle at 35% 45%,rgba(255,255,255,0.6) 1px,transparent 1px);background-size:180px 180px;}
+.ship{font-size:36px;position:relative;z-index:2;filter:drop-shadow(0 0 12px var(--neon-cyan));animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.game-card-info{padding:18px 20px;}
+.game-status-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.game-status-badge{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;}
+.badge-live{color:var(--neon-green);border:1px solid rgba(0,255,136,0.3);background:rgba(0,255,136,0.05);}
+.badge-soon{color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.04);}
+.game-name{font-family:'Orbitron',monospace;font-weight:700;font-size:16px;letter-spacing:1px;text-transform:uppercase;color:#fff;margin-bottom:6px;}
+.game-name.dimmed{color:rgba(255,255,255,0.55);}
+.game-desc{font-size:12px;color:rgba(255,255,255,0.6);line-height:1.6;font-weight:300;}
+.game-play-btn{display:inline-block;margin-top:14px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;color:var(--neon-cyan);border-bottom:1px solid rgba(0,245,255,0.3);padding-bottom:2px;transition:border-color 0.2s;}
+.game-play-btn:hover{border-color:var(--neon-cyan);}
+.game-coins{font-size:10px;color:var(--neon-amber);font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+.coming-soon-screen{background:#06060A;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
+.cs-question{font-size:48px;color:rgba(255,255,255,0.2);}
+.cs-loading{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;color:rgba(255,255,255,0.2);text-transform:uppercase;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:0.2;}50%{opacity:0.5;}}
+
+/* NEON SIGN */
+.neon-sign{position:absolute;top:32px;right:40px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--neon-pink);text-shadow:0 0 10px var(--neon-pink),0 0 20px var(--neon-pink);opacity:0;animation:flicker 6s 2s infinite, fadeIn 0.3s 1.6s forwards;}
+@keyframes flicker{0%,95%,97%,100%{opacity:1;}96%,98%{opacity:0.3;}}
+
+/* FOOTER */
+footer{border-top:1px solid rgba(0,245,255,0.15);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;background:rgba(6,6,10,0.95);}
+.footer-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,0.6);text-transform:uppercase;}
+.footer-logo span{color:var(--neon-cyan);opacity:0.8;}
+.footer-copy{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.45);}
+.footer-links{display:flex;gap:20px;}
+.footer-links a{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.5);text-decoration:none;text-transform:uppercase;transition:color 0.2s;}
+.footer-links a:hover{color:var(--neon-cyan);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+</style>
+</head>
+<body>
+<div class="glow-blob pink"></div>
+<div class="glow-blob cyan"></div>
+<div class="glow-blob purple"></div>
+<div class="grid-floor"></div>
+<div class="page">
+
+<nav>
+  <a href="#" class="nav-logo">DENNY'S <span>ARCADE</span></a>
+  <div class="nav-links">
+    <a href="#">Games</a>
+    <a href="#">Leaderboard</a>
+    <a href="#">About</a>
+  </div>
+  <a href="#games" class="nav-insert">&#9654; Insert Coin</a>
+</nav>
+
+<section class="hero">
+  <div class="neon-sign">OPEN 24 HRS</div>
+  <p class="hero-eyebrow">&#9670; Est. 2026 &nbsp;&middot;&nbsp; dennys-arcade.com &nbsp;&middot;&nbsp; Free Play &#9670;</p>
+  <h1 class="hero-title">
+    <span class="line1">DENNY'S</span>
+    <span class="line2">ARCADE</span>
+  </h1>
+  <p class="hero-sub">Where the quarters never run out &amp; the high scores never die</p>
+  <div class="hero-cta-group">
+    <a href="#games" class="btn-primary-arcade">&#9654; Play Now &mdash; Free</a>
+    <a href="#games" class="btn-secondary-arcade">Browse Games</a>
+  </div>
+</section>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>High Score</span><span class="sep">&#9670;</span>
+    <span>Free Play</span><span class="sep">&#9670;</span>
+    <span>New Games Coming Soon</span><span class="sep">&#9670;</span>
+    <span>Classic Vibes</span><span class="sep">&#9670;</span>
+    <span>Insert Coin</span><span class="sep">&#9670;</span>
+    <span>Player One Ready</span><span class="sep">&#9670;</span>
+    <span>Game Over? Try Again</span><span class="sep">&#9670;</span>
+    <span>Denny's Arcade</span><span class="sep">&#9670;</span>
+    <span>High Score</span><span class="sep">&#9670;</span>
+    <span>Free Play</span><span class="sep">&#9670;</span>
+    <span>New Games Coming Soon</span><span class="sep">&#9670;</span>
+    <span>Classic Vibes</span><span class="sep">&#9670;</span>
+    <span>Insert Coin</span><span class="sep">&#9670;</span>
+    <span>Player One Ready</span><span class="sep">&#9670;</span>
+    <span>Game Over? Try Again</span><span class="sep">&#9670;</span>
+    <span>Denny's Arcade</span><span class="sep">&#9670;</span>
+  </div>
+</div>
+
+<div class="construction-bar">
+  <p>&#9888; &nbsp;ARCADE UNDER CONSTRUCTION &nbsp;<em>&middot;</em>&nbsp; WE'RE BUILDING SOMETHING SPECIAL &nbsp;<em>&middot;</em>&nbsp; PARDON THE SAWDUST &mdash; ENJOY A GAME WHILE YOU WAIT</p>
+</div>
+
+<div class="leaderboard-strip">
+  <div class="lb-label">Top Scores</div>
+  <div class="lb-entries">
+    <div class="lb-entry"><span class="lb-rank">#1</span><span class="lb-name">ACE</span><span class="lb-score">148,200</span></div>
+    <div class="lb-sep"></div>
+    <div class="lb-entry"><span class="lb-rank">#2</span><span class="lb-name">DEN</span><span class="lb-score">112,750</span></div>
+    <div class="lb-sep"></div>
+    <div class="lb-entry"><span class="lb-rank">#3</span><span class="lb-name">ZAP</span><span class="lb-score">98,400</span></div>
+    <div class="lb-sep"></div>
+    <div class="lb-entry"><span class="lb-rank">#4</span><span class="lb-name">RAY</span><span class="lb-score">87,100</span></div>
+    <div class="lb-sep"></div>
+    <div class="lb-entry"><span class="lb-rank">#5</span><span class="lb-name">X81</span><span class="lb-score">76,500</span></div>
+  </div>
+</div>
+
+<div class="games-section" id="games">
+  <div class="section-header">
+    <span class="section-label">// Games</span>
+    <h2 class="section-title">The Arcade Floor</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="games-grid">
+
+    <div class="game-card active">
+      <div class="game-card-screen">
+        <div class="game-screen-art shooter-art">
+          <div class="ship">&#128640;</div>
+        </div>
+      </div>
+      <div class="game-card-info">
+        <div class="game-status-row">
+          <span class="game-status-badge badge-live">&#9679; Live Now</span>
+          <span class="game-coins">FREE PLAY</span>
+        </div>
+        <div class="game-name">Stellar Assault</div>
+        <div class="game-desc">Defend the galaxy from waves of alien invaders. Climb the leaderboard. Leave your mark.</div>
+        <a href="game.html" class="game-play-btn">&#9654; Play Now &rarr;</a>
+      </div>
+    </div>
+
+    <div class="game-card coming-soon">
+      <div class="game-card-screen">
+        <div class="coming-soon-screen">
+          <div class="cs-question">?</div>
+          <div class="cs-loading">Loading...</div>
+        </div>
+      </div>
+      <div class="game-card-info">
+        <div class="game-status-row">
+          <span class="game-status-badge badge-soon">&#9900; Coming Soon</span>
+        </div>
+        <div class="game-name dimmed">??? Learning Lab</div>
+        <div class="game-desc">Something educational is being loaded into the cabinet. Stay tuned.</div>
+      </div>
+    </div>
+
+    <div class="game-card coming-soon">
+      <div class="game-card-screen">
+        <div class="coming-soon-screen">
+          <div class="cs-question">?</div>
+          <div class="cs-loading">Loading...</div>
+        </div>
+      </div>
+      <div class="game-card-info">
+        <div class="game-status-row">
+          <span class="game-status-badge badge-soon">&#9900; Coming Soon</span>
+        </div>
+        <div class="game-name dimmed">More Incoming</div>
+        <div class="game-desc">We're wiring up more cabinets. Check back soon &mdash; this floor is just getting started.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">DENNY'S <span>ARCADE</span></div>
+  <div class="footer-links">
+    <a href="#">Games</a>
+    <a href="#">Leaderboard</a>
+    <a href="#">Merch</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Denny's Arcade &middot; Free to Play &middot; dennys-arcade.com</div>
+</footer>
+
+</div>
+</body>
+</html>
