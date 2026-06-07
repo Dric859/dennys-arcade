@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+    Asteroid Assault — Game Page
+    © 2026 Dennis Richards / Denny's Arcade (dennys-arcade.com)
+    All rights reserved. Unauthorized copying or distribution prohibited.
+-->
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Asteroid Assault — Denny's Arcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --neon-pink:#FF2D78;
+  --neon-cyan:#00F5FF;
+  --neon-purple:#BF00FF;
+  --neon-amber:#FFB800;
+  --neon-green:#00FF88;
+  --dark-bg:#0A0A0F;
+  --darker:#06060A;
+  --panel-bg:#0d0d1f;
+}
+html,body{min-height:100%;background:var(--dark-bg);color:#fff;font-family:'Exo 2',sans-serif;overflow-x:hidden;}
+
+/* scanlines */
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:200;}
+
+/* ambient glow */
+.glow-blob{position:fixed;border-radius:50%;filter:blur(140px);opacity:0.08;pointer-events:none;z-index:0;}
+.glow-blob.pink{width:500px;height:400px;background:var(--neon-pink);top:-100px;right:-100px;}
+.glow-blob.cyan{width:400px;height:300px;background:var(--neon-cyan);bottom:0;left:-100px;}
+.glow-blob.purple{width:350px;height:250px;background:var(--neon-purple);top:40%;left:35%;}
+
+/* ── NAV BAR ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(6,6,10,0.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(0,245,255,0.1);
+  padding:0 24px;height:50px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo-icon{width:28px;height:28px;background:var(--neon-amber);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.nav-logo-text{font-family:'Orbitron',monospace;font-weight:900;font-size:14px;letter-spacing:2px;color:#fff;text-transform:uppercase;}
+.nav-logo-text span{color:var(--neon-cyan);}
+.nav-center{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.25);text-transform:uppercase;}
+.nav-back{
+  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;color:rgba(255,255,255,0.55);
+  text-decoration:none;border:1px solid rgba(255,255,255,0.15);
+  padding:6px 14px;border-radius:4px;
+  transition:all 0.2s;display:flex;align-items:center;gap:6px;
+}
+.nav-back:hover{color:var(--neon-cyan);border-color:rgba(0,245,255,0.4);background:rgba(0,245,255,0.05);}
+
+/* ── PAGE ── */
+.page{position:relative;z-index:10;}
+
+/* ── CABINET SECTION ── */
+.cabinet-section{
+  display:flex;flex-direction:column;align-items:center;
+  padding:20px 20px 0;
+  max-width:80vw;margin:0 auto;width:80%;
+}
+
+/* MARQUEE */
+.marquee{
+  width:92%;
+  background:linear-gradient(180deg,#1a1a2e,#0d0d1a);
+  border:2px solid #222;border-bottom:none;
+  border-radius:12px 12px 0 0;
+  padding:12px 20px 8px;text-align:center;
+  box-shadow:0 0 40px rgba(0,245,255,0.1),0 0 80px rgba(191,0,255,0.07);
+}
+.marquee-sub{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;color:rgba(0,245,255,0.55);text-transform:uppercase;margin-bottom:3px;}
+.marquee-title{
+  font-family:'Orbitron',monospace;font-weight:900;font-size:22px;letter-spacing:6px;
+  text-transform:uppercase;
+  background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.marquee-lights{display:flex;justify-content:center;gap:7px;margin-top:7px;}
+.ml{width:5px;height:5px;border-radius:50%;animation:mlpulse 1.6s ease-in-out infinite;}
+.ml.c{background:var(--neon-cyan);box-shadow:0 0 5px var(--neon-cyan);}
+.ml.p{background:var(--neon-purple);box-shadow:0 0 5px var(--neon-purple);animation-delay:0.4s;}
+.ml.k{background:var(--neon-pink);box-shadow:0 0 5px var(--neon-pink);animation-delay:0.8s;}
+@keyframes mlpulse{0%,100%{opacity:1;}50%{opacity:0.25;}}
+
+/* CABINET BODY */
+.cabinet-body{
+  width:96%;
+  background:linear-gradient(180deg,#111120,#0a0a15);
+  border:2px solid #1e1e30;border-top:none;border-bottom:none;
+  display:flex;
+  clip-path:polygon(1% 0%,99% 0%,100% 100%,0% 100%);
+}
+
+/* SIDE PANELS */
+.side-panel{
+  width:48px;flex-shrink:0;
+  background:linear-gradient(180deg,#0d0d1f,#080810);
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:space-around;padding:16px 0;
+  position:relative;overflow:hidden;
+}
+.side-panel.l{border-right:1px solid #1a1a2e;}
+.side-panel.r{border-left:1px solid #1a1a2e;}
+.side-panel::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 30% 20%,rgba(255,255,255,0.7) 1px,transparent 1px),
+    radial-gradient(circle at 70% 50%,rgba(255,255,255,0.5) 1px,transparent 1px),
+    radial-gradient(circle at 20% 75%,rgba(255,255,255,0.6) 1px,transparent 1px),
+    radial-gradient(circle at 80% 85%,rgba(255,255,255,0.4) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+.side-panel::after{
+  content:'';position:absolute;width:60px;height:60px;border-radius:50%;
+  filter:blur(20px);opacity:0.12;top:35%;left:50%;transform:translate(-50%,-50%);
+}
+.side-panel.l::after{background:var(--neon-purple);}
+.side-panel.r::after{background:var(--neon-cyan);}
+.sdeco{width:2px;height:36px;border-radius:1px;position:relative;z-index:1;opacity:0.45;}
+.sdeco.c{background:linear-gradient(180deg,transparent,var(--neon-cyan),transparent);}
+.sdeco.p{background:linear-gradient(180deg,transparent,var(--neon-purple),transparent);}
+.sdeco.k{background:linear-gradient(180deg,transparent,var(--neon-pink),transparent);}
+
+/* SCREEN AREA */
+.screen-area{flex:1;display:flex;flex-direction:column;padding:10px;gap:6px;}
+
+/* BEZEL */
+.screen-bezel{
+  background:#030306;
+  border:3px solid #1a1a2e;
+  border-radius:3px;
+  box-shadow:inset 0 0 30px rgba(0,0,0,0.9),0 0 20px rgba(0,245,255,0.06);
+  overflow:hidden;position:relative;display:block;
+  width:100%;
+  /* tall enough to give the game room to breathe */
+  height:clamp(480px, 60vw, 800px);
+}
+.screen-bezel::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.1) 3px,rgba(0,0,0,0.1) 4px);
+  pointer-events:none;z-index:10;
+}
+.game-frame{width:100%;height:100%;border:none;display:block;background:#050508;position:absolute;top:0;left:0;}
+
+/* HUD STRIP */
+.hud-strip{
+  background:#070710;border:1px solid #1a1a2e;border-radius:3px;
+  padding:5px 14px;display:flex;justify-content:space-between;align-items:center;
+}
+.hud-item{text-align:center;}
+.hud-lbl{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(255,255,255,0.2);text-transform:uppercase;}
+.hud-val{font-family:'Share Tech Mono',monospace;font-size:12px;font-weight:700;color:var(--neon-cyan);letter-spacing:1px;}
+.hud-val.pk{color:var(--neon-pink);}
+.hud-val.am{color:var(--neon-amber);}
+
+/* CONTROL PANEL */
+.control-panel{
+  background:#070710;border:1px solid #1a1a2e;border-radius:3px;
+  padding:8px 14px;
+}
+.kbd-controls{display:flex;justify-content:center;gap:20px;align-items:center;flex-wrap:wrap;}
+.kbd-item{display:flex;align-items:center;gap:5px;}
+.kbd-key{
+  font-family:'Share Tech Mono',monospace;font-size:9px;
+  border:1px solid rgba(255,255,255,0.2);border-radius:3px;
+  padding:2px 7px;color:rgba(255,255,255,0.4);
+  background:rgba(255,255,255,0.04);
+}
+.kbd-desc{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:rgba(255,255,255,0.2);text-transform:uppercase;}
+
+/* TOUCH CONTROLS — mobile only */
+.touch-controls{display:none;justify-content:space-between;align-items:center;gap:8px;}
+.touch-btn{
+  background:rgba(0,245,255,0.05);border:1px solid rgba(0,245,255,0.2);
+  border-radius:6px;color:var(--neon-cyan);
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+  letter-spacing:1px;padding:14px 22px;cursor:pointer;text-transform:uppercase;
+  -webkit-tap-highlight-color:transparent;user-select:none;transition:background 0.1s;
+}
+.touch-btn:active{background:rgba(0,245,255,0.15);}
+.touch-btn.fire{
+  background:rgba(255,45,120,0.05);border-color:rgba(255,45,120,0.3);
+  color:var(--neon-pink);font-size:15px;font-weight:700;padding:14px 28px;
+}
+.touch-btn.fire:active{background:rgba(255,45,120,0.2);}
+.move-group{display:flex;gap:8px;}
+
+/* CABINET BASE */
+.cabinet-base{
+  width:89%;
+  background:linear-gradient(180deg,#0a0a15,#060610);
+  border:2px solid #1e1e30;border-top:none;
+  border-radius:0 0 14px 14px;
+  padding:7px;display:flex;justify-content:center;
+  box-shadow:0 10px 40px rgba(0,0,0,0.9);
+  clip-path:polygon(0% 0%,100% 0%,97% 100%,3% 100%);
+}
+.coin-slot{width:50px;height:5px;background:#0a0a10;border:1px solid #2a2a3a;border-radius:3px;}
+
+/* ── LEADERBOARD SECTION — below cabinet ── */
+.lb-section{
+  max-width:80vw;width:80%;margin:16px auto 0;
+  padding:0 0 30px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+/* shared card style */
+.lb-card,.activity-card,.info-card{
+  background:rgba(13,13,31,0.85);
+  border-radius:8px;overflow:hidden;
+}
+.lb-card{border:1px solid rgba(191,0,255,0.2);}
+.activity-card{border:1px solid rgba(0,245,255,0.15);}
+.info-card{border:1px solid rgba(255,45,120,0.15);padding-bottom:4px;}
+
+.card-header{
+  padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.lb-card .card-header{background:rgba(191,0,255,0.05);}
+.activity-card .card-header{background:rgba(0,245,255,0.04);}
+.info-card .card-header{background:rgba(255,45,120,0.04);}
+
+.card-title{font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;}
+.lb-card .card-title{color:var(--neon-purple);}
+.activity-card .card-title{color:var(--neon-cyan);}
+.info-card .card-title{color:var(--neon-pink);}
+.card-sub{font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,255,255,0.2);letter-spacing:1px;}
+
+/* leaderboard entries */
+.lb-entries{padding:4px 0;}
+.lb-entry{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 14px;border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.lb-entry:last-child{border-bottom:none;}
+.lb-rank{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--neon-amber);width:22px;flex-shrink:0;}
+.lb-rank.gold{color:#FFD700;text-shadow:0 0 8px rgba(255,215,0,0.4);}
+.lb-rank.silver{color:#C0C0C0;}
+.lb-rank.bronze{color:#CD7F32;}
+.lb-name{font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:2px;flex:1;}
+.lb-score{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--neon-cyan);letter-spacing:1px;}
+
+/* activity entries */
+.activity-entries{padding:4px 0;}
+.activity-entry{
+  padding:7px 14px;border-bottom:1px solid rgba(255,255,255,0.04);
+  display:flex;flex-direction:column;gap:2px;
+}
+.activity-entry:last-child{border-bottom:none;}
+.activity-player{font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(255,255,255,0.65);letter-spacing:1px;}
+.activity-detail{font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,255,255,0.22);letter-spacing:1px;}
+
+/* info rows */
+.info-rows{padding:6px 0 4px;}
+.info-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 14px;border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.info-row:last-child{border-bottom:none;}
+.info-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:1px;text-transform:uppercase;}
+.info-val{font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(255,255,255,0.6);letter-spacing:1px;}
+.info-val.green{color:var(--neon-green);}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid rgba(0,245,255,0.08);
+  padding:14px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(6,6,10,0.9);flex-wrap:wrap;gap:8px;
+}
+.footer-logo{font-family:'Orbitron',monospace;font-weight:900;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.35);text-transform:uppercase;}
+.footer-logo span{color:rgba(0,245,255,0.45);}
+.footer-copy{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.2);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .side-panel{display:none !important;}
+  .marquee{width:100%;border-radius:8px 8px 0 0;padding:8px 14px 6px;}
+  .marquee-title{font-size:16px;letter-spacing:3px;}
+  .marquee-sub{font-size:8px;letter-spacing:2px;}
+  .marquee-lights{gap:5px;margin-top:5px;}
+  .cabinet-body{clip-path:none;width:100%;}
+  .cabinet-base{width:100%;clip-path:none;border-radius:0 0 8px 8px;}
+  .screen-bezel{height:clamp(420px,90vw,650px);}
+  .hud-strip{padding:4px 8px;}
+  .hud-val{font-size:10px;}
+  .cabinet-section{padding:10px 8px 0;width:100%;max-width:100%;}
+  .hud-strip{display:none;}
+  .marquee-sub{display:none;}
+
+  .kbd-controls{display:none;}
+  .touch-controls{display:flex;}
+  .lb-section{grid-template-columns:1fr;}
+  .nav-center{display:none;}
+  nav{padding:0 12px;}
+  .cabinet-section{padding:12px 10px 0;}
+  .screen-bezel{height:clamp(280px,75vw,480px);}
+}
+@media(min-width:701px) and (max-width:900px){
+  .lb-section{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="glow-blob pink"></div>
+<div class="glow-blob cyan"></div>
+<div class="glow-blob purple"></div>
+
+<div class="page">
+
+<!-- NAV -->
+<nav>
+  <a href="https://dennys-arcade.com" class="nav-logo">
+    <div class="nav-logo-icon">🕹️</div>
+    <div class="nav-logo-text">DENNY'S <span>ARCADE</span></div>
+  </a>
+  <div class="nav-center">Asteroid Assault</div>
+  <a href="https://dennys-arcade.com" class="nav-back">← Back to Arcade</a>
+</nav>
+
+<!-- CABINET -->
+<div class="cabinet-section">
+
+  <div class="marquee">
+    <div class="marquee-sub">✦ Denny's Arcade ✦</div>
+    <div class="marquee-title">Asteroid Assault</div>
+    <div class="marquee-lights">
+      <div class="ml c"></div><div class="ml p"></div><div class="ml k"></div>
+      <div class="ml c"></div><div class="ml p"></div><div class="ml k"></div>
+      <div class="ml c"></div><div class="ml p"></div><div class="ml k"></div>
+    </div>
+  </div>
+
+  <div class="cabinet-body">
+
+    <div class="side-panel l">
+      <div class="sdeco c"></div><div class="sdeco p"></div>
+      <div class="sdeco k"></div><div class="sdeco c"></div>
+    </div>
+
+    <div class="screen-area">
+
+      <div class="screen-bezel">
+        <iframe class="game-frame"
+          src="asteroidassault.html"
+          title="Asteroid Assault"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <div class="hud-strip">
+        <div class="hud-item">
+          <div class="hud-lbl">Score</div>
+          <div class="hud-val">000000</div>
+        </div>
+        <div class="hud-item">
+          <div class="hud-lbl">Lives</div>
+          <div class="hud-val pk">♥ ♥ ♥ ♥ ♥</div>
+        </div>
+        <div class="hud-item">
+          <div class="hud-lbl">Hi-Score</div>
+          <div class="hud-val am">000000</div>
+        </div>
+        <div class="hud-item">
+          <div class="hud-lbl">Level</div>
+          <div class="hud-val">01</div>
+        </div>
+      </div>
+
+      <div class="control-panel">
+        <div class="kbd-controls">
+          <div class="kbd-item">
+            <span class="kbd-key">←</span><span class="kbd-key">→</span>
+            <span class="kbd-desc">Move</span>
+          </div>
+          <div class="kbd-item">
+            <span class="kbd-key">Space</span>
+            <span class="kbd-desc">Fire</span>
+          </div>
+          <div class="kbd-item">
+            <span class="kbd-key">P</span>
+            <span class="kbd-desc">Pause</span>
+          </div>
+          <div class="kbd-item">
+            <span class="kbd-key">M</span>
+            <span class="kbd-desc">Mute</span>
+          </div>
+        </div>
+        <div class="touch-controls">
+          <div class="move-group">
+            <button class="touch-btn"
+              ontouchstart="sendKey('ArrowLeft',true)" ontouchend="sendKey('ArrowLeft',false)"
+              onmousedown="sendKey('ArrowLeft',true)" onmouseup="sendKey('ArrowLeft',false)">◀ Left</button>
+            <button class="touch-btn"
+              ontouchstart="sendKey('ArrowRight',true)" ontouchend="sendKey('ArrowRight',false)"
+              onmousedown="sendKey('ArrowRight',true)" onmouseup="sendKey('ArrowRight',false)">Right ▶</button>
+          </div>
+          <button class="touch-btn fire"
+            ontouchstart="sendKey(' ',true)" ontouchend="sendKey(' ',false)"
+            onmousedown="sendKey(' ',true)" onmouseup="sendKey(' ',false)">🔥 Fire</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="side-panel r">
+      <div class="sdeco p"></div><div class="sdeco c"></div>
+      <div class="sdeco k"></div><div class="sdeco p"></div>
+    </div>
+
+  </div>
+
+  <div class="cabinet-base">
+    <div class="coin-slot"></div>
+  </div>
+
+</div><!-- end cabinet-section -->
+
+<!-- LEADERBOARD BELOW CABINET -->
+<div class="lb-section">
+
+  <!-- Top Scores -->
+  <div class="lb-card">
+    <div class="card-header">
+      <div class="card-title">Top Scores</div>
+      <div class="card-sub">All Time</div>
+    </div>
+    <div class="lb-entries">
+      <div class="lb-entry"><span class="lb-rank gold">#1</span><span class="lb-name">ACE</span><span class="lb-score">148,200</span></div>
+      <div class="lb-entry"><span class="lb-rank silver">#2</span><span class="lb-name">DEN</span><span class="lb-score">112,750</span></div>
+      <div class="lb-entry"><span class="lb-rank bronze">#3</span><span class="lb-name">ZAP</span><span class="lb-score">98,400</span></div>
+      <div class="lb-entry"><span class="lb-rank">#4</span><span class="lb-name">RAY</span><span class="lb-score">87,100</span></div>
+      <div class="lb-entry"><span class="lb-rank">#5</span><span class="lb-name">X81</span><span class="lb-score">76,500</span></div>
+    </div>
+  </div>
+
+  <!-- Recent Players -->
+  <div class="activity-card">
+    <div class="card-header">
+      <div class="card-title">Recent Players</div>
+      <div class="card-sub">Live Feed</div>
+    </div>
+    <div class="activity-entries">
+      <div class="activity-entry">
+        <span class="activity-player">ZAP — 98,400 pts</span>
+        <span class="activity-detail">Level 9 · 2 minutes ago</span>
+      </div>
+      <div class="activity-entry">
+        <span class="activity-player">DEN — 112,750 pts</span>
+        <span class="activity-detail">Level 11 · 18 minutes ago</span>
+      </div>
+      <div class="activity-entry">
+        <span class="activity-player">ACE — 148,200 pts</span>
+        <span class="activity-detail">Level 14 · 1 hour ago</span>
+      </div>
+      <div class="activity-entry">
+        <span class="activity-player">X81 — 76,500 pts</span>
+        <span class="activity-detail">Level 7 · 2 hours ago</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Info -->
+  <div class="info-card">
+    <div class="card-header">
+      <div class="card-title">Game Info</div>
+    </div>
+    <div class="info-rows">
+      <div class="info-row"><span class="info-lbl">Version</span><span class="info-val">1.0.0</span></div>
+      <div class="info-row"><span class="info-lbl">Status</span><span class="info-val green">● Live</span></div>
+      <div class="info-row"><span class="info-lbl">Bonus Life</span><span class="info-val">1k · 5k · 10k pts</span></div>
+      <div class="info-row"><span class="info-lbl">Controls</span><span class="info-val">Keys + Touch</span></div>
+      <div class="info-row"><span class="info-lbl">Cost</span><span class="info-val green">Free Play</span></div>
+    </div>
+  </div>
+
+</div><!-- end lb-section -->
+
+<footer>
+  <div class="footer-logo">DENNY'S <span>ARCADE</span></div>
+  <div class="footer-copy">© 2026 Dennis Richards · dennys-arcade.com · Free to Play</div>
+</footer>
+
+</div><!-- end page -->
+
+<script>
+const gameFrame = document.querySelector('.game-frame');
+
+function sendKey(key, isDown) {
+  try {
+    const code = key === ' ' ? 'Space' : key === 'ArrowLeft' ? 'ArrowLeft' : 'ArrowRight';
+    const ev = new KeyboardEvent(isDown ? 'keydown' : 'keyup', {key, code, bubbles:true, cancelable:true});
+    gameFrame.contentWindow.document.dispatchEvent(ev);
+  } catch(e) {
+    try { gameFrame.contentWindow.focus(); } catch(e2){}
+  }
+}
+
+window.addEventListener('keydown', e => {
+  if([' ','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) e.preventDefault();
+});
+</script>
+
+</body>
+</html>

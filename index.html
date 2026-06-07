@@ -218,7 +218,7 @@ footer{border-top:1px solid rgba(0,245,255,0.15);padding:32px 40px;display:flex;
         </div>
         <div class="game-name">Stellar Assault</div>
         <div class="game-desc">Defend the galaxy from waves of alien invaders. Climb the leaderboard. Leave your mark.</div>
-        <a href="game.html" class="game-play-btn">&#9654; Play Now &rarr;</a>
+        <a href="#" class="game-play-btn" onclick="launchGame(); return false;">&#9654; Play Now &rarr;</a>
       </div>
     </div>
 
@@ -269,5 +269,11 @@ footer{border-top:1px solid rgba(0,245,255,0.15);padding:32px 40px;display:flex;
 </footer>
 
 </div>
+<script>
+function launchGame() {
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
+    window.location.href = isMobile ? 'asteroidassault-mobile.html' : 'asteroid-assault.html';
+}
+</script>
 </body>
 </html>
