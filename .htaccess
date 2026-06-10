@@ -1,0 +1,32 @@
+# Denny's Arcade — .htaccess
+# © 2026 Dennis Richards / dennys-arcade.com
+
+# ── Custom error pages ────────────────────────────────────────
+ErrorDocument 404 /404.html
+ErrorDocument 403 /404.html
+ErrorDocument 500 /404.html
+
+# ── Force HTTPS ───────────────────────────────────────────────
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ── Security headers ──────────────────────────────────────────
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set X-Content-Type-Options "nosniff"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+# ── Block directory listing ───────────────────────────────────
+Options -Indexes
+
+# ── Block sensitive files ─────────────────────────────────────
+<FilesMatch "\.(sql|log|bak|env|git|gitignore|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# ── Block access to hidden files ──────────────────────────────
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
