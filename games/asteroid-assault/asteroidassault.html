@@ -21,7 +21,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { overflow: hidden; background: black; font-family: 'Courier New', Courier, monospace; }
     canvas { display: block; background: radial-gradient(circle at center, #07111f, #000); }
-    #hudLeft { position: absolute; top: 20px; left: 20px; width: 220px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,200,0,0.4); border-radius: 8px; padding: 20px; color: white; display: none; }
+    #hudLeft { position: absolute; top: 10px; left: 10px; width: clamp(90px,22vw,160px); background: rgba(0,0,0,0.7); border: 1px solid rgba(255,200,0,0.4); border-radius: 8px; padding: 10px 12px; color: white; display: none; }
     #hudLeft h2 { color: #ffcc00; margin-bottom: 6px; font-size: 13px; letter-spacing: 3px; text-shadow: 0 0 8px #ffcc00; }
     #hudLeft div { margin-bottom: 16px; font-size: 26px; color: #fff; text-shadow: 0 0 6px #fff; }
     #hudTop { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); text-align: center; color: #ffcc00; display: none; font-size: 12px; letter-spacing: 3px; text-shadow: 0 0 8px #ffcc00; }
@@ -44,28 +44,41 @@
     @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-60px); } }
     #muteBtn { position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,200,0,0.4); border-radius: 8px; padding: 8px 14px; color: #ffcc00; cursor: pointer; font-family: 'Courier New', monospace; font-size: 13px; letter-spacing: 2px; text-shadow: 0 0 8px #ffcc00; z-index: 10; display: none; transition: all 0.15s; }
     #muteBtn:hover { background: rgba(255,200,0,0.15); box-shadow: 0 0 12px rgba(255,200,0,0.4); }
+@media (max-width: 500px) {
+    #hudLeft { width: 80px !important; padding: 6px 8px !important; font-size: 9px !important; }
+    #hudLeft h2 { font-size: 8px !important; letter-spacing: 1px !important; }
+    #hudLeft div { font-size: 16px !important; }
+    #hudTop { font-size: 9px !important; padding: 4px 10px !important; }
+    #muteBtn { font-size: 10px !important; padding: 5px 8px !important; bottom: 10px !important; right: 10px !important; }
+    #helpBtn { font-size: 10px !important; padding: 5px 8px !important; bottom: 10px !important; left: 10px !important; }
+}
 </style>
 </head>
 <body>
 <div id="scanlines"></div>
 <button id="muteBtn" onclick="toggleMute()">🔊 SOUND</button>
+<button id="helpBtn" onclick="toggleHelp()" style="position:absolute;bottom:20px;left:20px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,200,0,0.4);border-radius:8px;padding:8px 14px;color:#ffcc00;cursor:pointer;font-family:'Courier New',monospace;font-size:13px;letter-spacing:2px;text-shadow:0 0 8px #ffcc00;z-index:10;display:none;">❓ HELP</button>
+<div id="helpModal" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.85);z-index:50;align-items:center;justify-content:center;flex-direction:column;gap:12px;font-family:'Courier New',monospace;text-align:center;padding:20px;">
+  <div style="color:#ffcc00;font-size:16px;font-weight:bold;letter-spacing:2px;margin-bottom:8px;">CONTROLS</div>
+  <div style="color:#aaa;font-size:13px;line-height:2;">
+    <div>⬅ ➡ &nbsp;&nbsp; MOVE</div>
+    <div>SPACE &nbsp; SHOOT</div>
+    <div>A / D &nbsp;&nbsp; MOVE</div>
+  </div>
+  <div style="border-top:1px solid #333;padding-top:12px;margin-top:4px;color:#777;font-size:11px;line-height:2;">
+    <div>🪨 ASTEROID &nbsp; 10 PTS</div>
+    <div>🟢 GREEN UFO &nbsp; 50 PTS</div>
+    <div>🔴 RED UFO &nbsp; 100 PTS</div>
+  </div>
+  <button onclick="toggleHelp()" style="margin-top:12px;background:rgba(255,200,0,0.1);border:1px solid rgba(255,200,0,0.4);border-radius:6px;padding:8px 24px;color:#ffcc00;cursor:pointer;font-family:'Courier New',monospace;font-size:12px;letter-spacing:2px;">CLOSE ✕</button>
+</div>
 <div id="hudLeft">
     <h2>SCORE</h2><div id="score">0</div>
     <h2>LIVES</h2><div id="lives">5</div>
     <h2>LEVEL</h2><div id="level">1</div>
 </div>
 <div id="hudTop">HI-SCORE<span id="hiScoreDisplay">0</span></div>
-<div id="controls">
-    <h2>CONTROLS</h2>
-    <p>⬅ ➡ &nbsp; MOVE</p>
-    <p>SPACE &nbsp; SHOOT</p>
-    <p>A / D &nbsp;&nbsp; MOVE</p>
-    <div class="legend">
-        <p>🪨 ASTEROID &nbsp; 10 PTS</p>
-        <p>🟢 GREEN UFO &nbsp; 50 PTS</p>
-        <p>🔴 RED UFO &nbsp; 100 PTS</p>
-    </div>
-</div>
+
 <div id="countdown"></div>
 <div id="gameOver">
     <h1>GAME OVER</h1>
@@ -87,7 +100,6 @@ const finalScoreEl = document.getElementById("finalScore");
 const gameOverEl = document.getElementById("gameOver");
 const hudLeftEl = document.getElementById("hudLeft");
 const hudTopEl = document.getElementById("hudTop");
-const controlsEl = document.getElementById("controls");
 const countdownEl = document.getElementById("countdown");
 const hiScoreDisplay = document.getElementById("hiScoreDisplay");
 const hiScoreMsgEl = document.getElementById("hiScoreMsg");
@@ -139,6 +151,11 @@ function getAudioCtx() {
     // Resume if suspended (browser autoplay policy)
     if (audioCtx.state === 'suspended') audioCtx.resume();
     return audioCtx;
+}
+
+function toggleHelp() {
+    const modal = document.getElementById('helpModal');
+    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
 }
 
 function toggleMute() {
@@ -855,7 +872,7 @@ function endGame() {
     gameRunning = false;
     gameState = "exploding";
     stopMusic();
-    hudLeftEl.style.display = hudTopEl.style.display = controlsEl.style.display = document.getElementById("muteBtn").style.display = "none";
+    hudLeftEl.style.display = hudTopEl.style.display = document.getElementById("muteBtn").style.display = document.getElementById("helpBtn").style.display = "none"; document.getElementById('helpModal').style.display = 'none';
 
     // Trigger the ship explosion
     triggerPlayerExplosion(player.x, player.y);
@@ -975,13 +992,13 @@ function startCountdown() {
 function startGame() {
     gameState = "playing"; gameRunning = true;
     startMusic();
-    hudLeftEl.style.display = hudTopEl.style.display = controlsEl.style.display = document.getElementById("muteBtn").style.display = "block";
+    hudLeftEl.style.display = hudTopEl.style.display = document.getElementById("muteBtn").style.display = document.getElementById("helpBtn").style.display = "block";
     updateUI(); spawnAsteroid(); animate();
 }
 
 function showStartScreen() {
     gameOverEl.style.display = "none";
-    hudLeftEl.style.display = hudTopEl.style.display = controlsEl.style.display = document.getElementById("muteBtn").style.display = "none";
+    hudLeftEl.style.display = hudTopEl.style.display = document.getElementById("muteBtn").style.display = document.getElementById("helpBtn").style.display = "none"; document.getElementById('helpModal').style.display = 'none';
     gameState = "start"; initGameObjects(); drawStartScreen();
 }
 

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+    Asteroid Assault — Mobile Game Page
+    © 2026 Dennis Richards / Denny's Arcade (dennys-arcade.com)
+    All rights reserved. Unauthorized copying or distribution prohibited.
+-->
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Asteroid Assault — Denny's Arcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;touch-action:none;}
+
+/* Thin nav */
+nav{
+  position:fixed;top:0;left:0;right:0;height:44px;z-index:100;
+  background:rgba(6,6,10,0.95);
+  border-bottom:1px solid rgba(0,245,255,0.12);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;
+}
+.nav-logo{
+  font-family:'Orbitron',monospace;font-weight:900;font-size:12px;
+  letter-spacing:2px;color:#fff;text-transform:uppercase;text-decoration:none;
+  display:flex;align-items:center;gap:8px;
+}
+.nav-logo-icon{width:22px;height:22px;background:#FFB800;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;}
+.nav-logo span{color:#00F5FF;}
+.nav-back{
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
+  color:rgba(255,255,255,0.5);text-decoration:none;
+  border:1px solid rgba(255,255,255,0.15);border-radius:3px;padding:4px 10px;
+}
+
+/* Game iframe — fills below nav */
+.game-container{
+  position:fixed;
+  top:44px;left:0;right:0;bottom:0;
+}
+iframe{
+  width:100%;height:100%;
+  border:none;display:block;
+  background:#000;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://dennys-arcade.com" class="nav-logo">
+    <div class="nav-logo-icon">🕹️</div>
+    DENNY'S <span>ARCADE</span>
+  </a>
+  <a href="https://dennys-arcade.com" class="nav-back">← Arcade</a>
+</nav>
+
+<div class="game-container">
+  <iframe src="asteroidassault-mobile.html"
+    title="Asteroid Assault Mobile"
+    allowfullscreen
+    allow="autoplay">
+  </iframe>
+</div>
+
+</body>
+</html>
